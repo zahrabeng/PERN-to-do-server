@@ -46,9 +46,30 @@ app.delete("/todolist/:id", async (req, res) => {
   const value = [`${id}`];
   const result = await client.query(text, value);
   const didRemove = result.rowCount === 1;
+
   if (didRemove){
     res.status(200).json({
       status:"successfully deleted"
+    })
+  }
+})
+
+//edit a to do
+app.put("/todolist/:id", async (req, res) => {
+  const id = parseInt(req.params.id)
+  const {description} = req.body;
+  const text = "UPDATE todo SET description = $1 WHERE id = $2 RETURNING *"
+  const values = [`${description}`, `${id}`];
+  const result = await client.query(text, values);
+  const didChange = result.rowCount === 1;
+
+  if (didChange){
+    const updatedToDo = result.rows[0]
+    res.status(200).json({
+      status:"successfull edit",
+      data:{
+        toDo: updatedToDo
+      }
     })
   }
 })
