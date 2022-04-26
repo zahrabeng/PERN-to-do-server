@@ -24,6 +24,22 @@ app.get("/todolist" , async (req, res) => {
   })
 });
 
+//get a to do with id
+app.get("/todolist/:id" , async (req, res) => {
+  const id = parseInt(req.params.id)
+  const text = "SELECT * FROM todo WHERE id = $1"
+  const value = [`${id}`]
+  const toDo = await client.query(text, value);
+  const result = toDo.rows
+
+if(result){
+  res.status(200).json({
+    data: result
+  })
+}
+});
+
+
 // create a to do
 app.post("/todolist", async(req, res) => {
 
