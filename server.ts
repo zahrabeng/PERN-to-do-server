@@ -39,6 +39,20 @@ app.post("/todolist", async(req, res) => {
     }});
   });
 
+//delete a to do
+app.delete("/todolist/:id", async (req, res) => {
+  const id = req.params.id;
+  const text = "DELETE FROM todo WHERE id = $1 RETURNING *";
+  const value = [`${id}`];
+  const result = await client.query(text, value);
+  const didRemove = result.rowCount === 1;
+  if (didRemove){
+    res.status(200).json({
+      status:"successfully deleted"
+    })
+  }
+})
+
 
 // use the environment variable PORT, or 5000 as a fallback
 const PORT_NUMBER = 5000;
