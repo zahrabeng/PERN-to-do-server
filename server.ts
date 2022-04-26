@@ -3,40 +3,45 @@ import { config } from "dotenv";
 import express from "express";
 import cors from "cors";
 
-config(); //Read .env file lines as though they were env vars.
+config();
+const client = new Client({ database: 'perntodo' });
 
-//Call this script with the environment variable LOCAL set if you want to connect to a local db (i.e. without SSL)
-//Do not set the environment variable LOCAL if you want to connect to a heroku DB.
-
-//For the ssl property of the DB connection config, use a value of...
-// false - when connecting to a local DB
-// { rejectUnauthorized: false } - when connecting to a heroku DB
-const herokuSSLSetting = { rejectUnauthorized: false }
-const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
-const dbConfig = {
-  connectionString: process.env.DATABASE_URL,
-  ssl: sslSetting,
-};
-
+//middleware
 const app = express();
+app.use(express.json()) //req.body;
+app.use(cors());
 
-app.use(express.json()); //add body parser to each following route handler
-app.use(cors()) //add CORS support to each following route handler
-
-const client = new Client(dbConfig);
 client.connect();
 
-app.get("/", async (req, res) => {
-  const dbres = await client.query('select * from categories');
-  res.json(dbres.rows);
+//ROUTES//
+
+// get a todo
+app.get("/todolist" , async (req, res) => {
+  const allToDos = await client.query('SELECT * FROM todo');
+  const result = allToDos.rows
+  res.status(200).json({
+    data: result
+  })
 });
 
+// create a to do
+app.post("/todolist", async(req, res) => {
 
-//Start the server on the given port
-const port = process.env.PORT;
-if (!port) {
-  throw 'Missing PORT environment variable.  Set it in .env file.';
-}
-app.listen(port, () => {
-  console.log(`Server is up and running on port ${port}`);
+    const {description} = req.body;
+    const text = "INSERT INTO todo (description) VALUES ($1) RETURNING *";
+    const values = [`${description}`]
+    const result = await client.query(text, values)
+    const newToDo = result.rows[0]
+    res.status(200).json({
+    data:{
+      status: "success",
+       description: newToDo
+    }});
+  });
+
+
+// use the environment variable PORT, or 5000 as a fallback
+const PORT_NUMBER = 5000;
+app.listen(PORT_NUMBER, () => {
+  console.log(`Server is listening on port ${PORT_NUMBER}!`);
 });
