@@ -41,7 +41,7 @@ app.post("/todolist", async(req, res) => {
 
 //delete a to do
 app.delete("/todolist/:id", async (req, res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
   const text = "DELETE FROM todo WHERE id = $1 RETURNING *";
   const value = [`${id}`];
   const result = await client.query(text, value);
