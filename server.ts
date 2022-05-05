@@ -50,7 +50,6 @@ app.post("/todolist", async(req, res) => {
     const newToDo = result.rows[0]
     res.status(200).json({
     data:{
-      status: "success",
        description: newToDo
     }});
   });
@@ -92,7 +91,7 @@ app.put("/todolist/:id", async (req, res) => {
 
 
 // use the environment variable PORT, or 5000 as a fallback
-const PORT_NUMBER = 5000;
+const PORT_NUMBER = 4000;
 app.listen(PORT_NUMBER, () => {
   console.log(`Server is listening on port ${PORT_NUMBER}!`);
 });
