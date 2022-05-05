@@ -49,10 +49,12 @@ app.post("/todolist", async(req, res) => {
     const result = await client.query(text, values)
     const newToDo = result.rows[0]
     res.status(200).json({
+    status:"sucess",
     data:{
-       description: newToDo
-    }});
-  });
+       description: newToDo,
+    }
+  })
+})
 
 //delete a to do
 app.delete("/todolist/:id", async (req, res) => {
